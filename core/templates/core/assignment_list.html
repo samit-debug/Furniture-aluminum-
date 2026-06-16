@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Work Assignment{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        {% include "core/_search.html" %}
+        {% if is_admin_role %}
+            <a class="btn btn-primary btn-sm" href="{% url 'assignment-add' %}">Assign Work</a>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Worker</th>
+                    <th>Start</th>
+                    <th>Expected Finish</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for assignment in assignments %}
+                <tr>
+                    <td><a href="{% url 'order-detail' assignment.order.pk %}">#{{ assignment.order.pk }} {{ assignment.order.product_name }}</a></td>
+                    <td>{{ assignment.order.customer.name }}</td>
+                    <td>{{ assignment.worker.name }}</td>
+                    <td>{{ assignment.start_date }}</td>
+                    <td>{{ assignment.expected_finish_date|default:"-" }}</td>
+                    <td>{{ assignment.get_status_display }}</td>
+                    <td>
+                        {% if is_admin_role %}
+                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'assignment-edit' assignment.pk %}">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-muted">Assignment record abhi empty hai.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "core/_pagination.html" %}
+</section>
+{% endblock %}

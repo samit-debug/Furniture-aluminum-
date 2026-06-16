@@ -1,0 +1,76 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Bill {{ invoice.invoice_number }}{% endblock %}
+
+{% block content %}
+<section class="invoice-toolbar">
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'invoice-list' %}">Back</a>
+    <button class="btn btn-primary btn-sm" type="button" onclick="window.print()">Print / PDF</button>
+</section>
+
+<section class="invoice-sheet">
+    <header class="invoice-head">
+        <div>
+            <h2>{{ business_profile.shop_name }}</h2>
+            <p>Aluminum, furniture, custom design and workshop orders</p>
+            {% if business_profile.mobile %}<p>{{ business_profile.mobile }}</p>{% endif %}
+            {% if business_profile.gst_number %}<p>GST: {{ business_profile.gst_number }}</p>{% endif %}
+        </div>
+        <div class="invoice-meta">
+            <strong>{{ invoice.invoice_number }}</strong>
+            <span>Date: {{ invoice.issue_date }}</span>
+        </div>
+    </header>
+
+    <section class="invoice-parties">
+        <div>
+            <span>Bill To</span>
+            <strong>{{ invoice.order.customer.name }}</strong>
+            <p>{{ invoice.order.customer.mobile }}</p>
+            <p>{{ invoice.order.customer.address }}</p>
+        </div>
+        <div>
+            <span>Order</span>
+            <strong>#{{ invoice.order.pk }} - {{ invoice.order.product_name }}</strong>
+            <p>Status: {{ invoice.order.get_status_display }}</p>
+            <p>Delivery: {{ invoice.order.delivery_date|default:"-" }}</p>
+        </div>
+    </section>
+
+    <div class="table-responsive">
+        <table class="table invoice-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Design</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ invoice.order.product_name }}</td>
+                    <td>{{ invoice.order.quantity }}</td>
+                    <td>{{ invoice.order.design_type|default:"-" }}</td>
+                    <td class="text-end">Rs. {{ invoice.order.total_amount|floatformat:2 }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <section class="invoice-total">
+        <dl>
+            <dt>Subtotal</dt><dd>Rs. {{ invoice.order.total_amount|floatformat:2 }}</dd>
+            <dt>Discount</dt><dd>Rs. {{ invoice.order.discount|floatformat:2 }}</dd>
+            <dt>GST</dt><dd>Rs. {{ invoice.order.gst_amount|floatformat:2 }}</dd>
+            <dt>Final Total</dt><dd>Rs. {{ invoice.order.net_total|floatformat:2 }}</dd>
+            <dt>Advance + Paid</dt><dd>Rs. {{ invoice.order.paid_amount|floatformat:2 }}</dd>
+            <dt>Remaining</dt><dd>Rs. {{ invoice.order.remaining_amount|floatformat:2 }}</dd>
+        </dl>
+    </section>
+
+    {% if invoice.notes %}
+        <p class="invoice-note">{{ invoice.notes }}</p>
+    {% endif %}
+</section>
+{% endblock %}

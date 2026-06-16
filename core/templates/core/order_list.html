@@ -1,0 +1,63 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Orders{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header stackable">
+        <div class="toolbar-row">
+            {% include "core/_search.html" %}
+            <form method="get" class="status-filter">
+                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Status</option>
+                    {% for value,label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        {% if is_staff_role %}
+            <a class="btn btn-primary btn-sm" href="{% url 'order-add' %}">Add Order</a>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Type</th>
+                    <th>Qty</th>
+                    <th>Delivery</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td><a href="{% url 'order-detail' order.pk %}">#{{ order.pk }} {{ order.product_name }}</a></td>
+                    <td>{{ order.customer.name }}</td>
+                    <td>{{ order.get_order_type_display }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.delivery_date|default:"-" }}</td>
+                    <td><span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                    <td>{{ order.payment_status }} / Rs. {{ order.remaining_amount|floatformat:2 }}</td>
+                    <td class="table-actions">
+                        {% if is_staff_role %}
+                            <a class="btn btn-outline-primary btn-sm" href="{% url 'measurement-form' order.pk %}">Measurement</a>
+                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'order-edit' order.pk %}">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="8" class="text-muted">Order record abhi empty hai.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "core/_pagination.html" %}
+</section>
+{% endblock %}

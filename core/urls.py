@@ -1,0 +1,40 @@
+from django.urls import path
+
+from . import views
+
+
+urlpatterns = [
+    path("", views.dashboard, name="dashboard"),
+    path("catalog/", views.public_catalog, name="public-catalog"),
+    path("settings/", views.business_settings, name="business-settings"),
+    path("customers/", views.CustomerListView.as_view(), name="customer-list"),
+    path("customers/add/", views.CustomerCreateView.as_view(), name="customer-add"),
+    path("customers/<int:pk>/", views.CustomerDetailView.as_view(), name="customer-detail"),
+    path("customers/<int:pk>/edit/", views.CustomerUpdateView.as_view(), name="customer-edit"),
+    path("products/", views.ProductListView.as_view(), name="product-list"),
+    path("products/add/", views.ProductCreateView.as_view(), name="product-add"),
+    path("products/<int:pk>/edit/", views.ProductUpdateView.as_view(), name="product-edit"),
+    path("orders/", views.OrderListView.as_view(), name="order-list"),
+    path("orders/add/", views.OrderCreateView.as_view(), name="order-add"),
+    path("orders/<int:pk>/", views.OrderDetailView.as_view(), name="order-detail"),
+    path("orders/<int:pk>/edit/", views.OrderUpdateView.as_view(), name="order-edit"),
+    path("orders/<int:order_pk>/measurement/", views.measurement_form, name="measurement-form"),
+    path("orders/<int:order_pk>/payment/", views.payment_for_order, name="payment-for-order"),
+    path("orders/<int:order_pk>/invoice/", views.invoice_for_order, name="invoice-for-order"),
+    path("stock/", views.StockListView.as_view(), name="stock-list"),
+    path("stock/add/", views.StockCreateView.as_view(), name="stock-add"),
+    path("stock/<int:pk>/edit/", views.StockUpdateView.as_view(), name="stock-edit"),
+    path("workers/", views.WorkerListView.as_view(), name="worker-list"),
+    path("workers/add/", views.WorkerCreateView.as_view(), name="worker-add"),
+    path("workers/<int:pk>/edit/", views.WorkerUpdateView.as_view(), name="worker-edit"),
+    path("assignments/", views.AssignmentListView.as_view(), name="assignment-list"),
+    path("assignments/add/", views.AssignmentCreateView.as_view(), name="assignment-add"),
+    path("assignments/<int:pk>/edit/", views.AssignmentUpdateView.as_view(), name="assignment-edit"),
+    path("payments/", views.PaymentListView.as_view(), name="payment-list"),
+    path("payments/add/", views.PaymentCreateView.as_view(), name="payment-add"),
+    path("billing/", views.InvoiceListView.as_view(), name="invoice-list"),
+    path("billing/add/", views.InvoiceCreateView.as_view(), name="invoice-add"),
+    path("billing/<int:pk>/", views.InvoiceDetailView.as_view(), name="invoice-detail"),
+    path("reports/", views.ReportListView.as_view(), name="report-list"),
+    path("reports/add/", views.ReportCreateView.as_view(), name="report-add"),
+]

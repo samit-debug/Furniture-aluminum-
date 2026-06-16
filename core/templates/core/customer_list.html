@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Customers{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        {% include "core/_search.html" %}
+        <a class="btn btn-primary btn-sm" href="{% url 'customer-add' %}">Add Customer</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>Address</th>
+                    <th>Pending</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for customer in customers %}
+                <tr>
+                    <td><a href="{% url 'customer-detail' customer.pk %}">{{ customer.name }}</a></td>
+                    <td>{{ customer.mobile }}</td>
+                    <td>{{ customer.address|truncatechars:50 }}</td>
+                    <td>Rs. {{ customer.pending_payment|floatformat:2 }}</td>
+                    <td class="table-actions">
+                        <a class="btn btn-outline-primary btn-sm" href="tel:{{ customer.mobile }}">Call</a>
+                        <a class="btn btn-outline-success btn-sm" target="_blank" href="https://wa.me/{{ customer.mobile }}">WhatsApp</a>
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'customer-edit' customer.pk %}">Edit</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-muted">Customer record abhi empty hai.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "core/_pagination.html" %}
+</section>
+{% endblock %}

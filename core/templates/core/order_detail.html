@@ -1,0 +1,143 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Order #{{ order.pk }}{% endblock %}
+
+{% block content %}
+<section class="summary-strip">
+    <article>
+        <span>Status</span>
+        <strong><span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span></strong>
+    </article>
+    <article>
+        <span>Total</span>
+        <strong>Rs. {{ order.net_total|floatformat:2 }}</strong>
+    </article>
+    <article>
+        <span>Paid</span>
+        <strong>Rs. {{ order.paid_amount|floatformat:2 }}</strong>
+    </article>
+    <article>
+        <span>Remaining</span>
+        <strong>Rs. {{ order.remaining_amount|floatformat:2 }}</strong>
+    </article>
+</section>
+
+<section class="split-summary mt-4">
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Order Details</h2>
+            {% if is_staff_role %}
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'order-edit' order.pk %}">Edit</a>
+            {% endif %}
+        </div>
+        <dl class="detail-list">
+            <dt>Customer</dt><dd><a href="{% url 'customer-detail' order.customer.pk %}">{{ order.customer.name }}</a></dd>
+            <dt>Mobile</dt><dd>{{ order.customer.mobile }}</dd>
+            <dt>Order Type</dt><dd>{{ order.get_order_type_display }}</dd>
+            <dt>Product</dt><dd>{{ order.product_name }}</dd>
+            <dt>Design</dt><dd>{{ order.design_type|default:"-" }}</dd>
+            <dt>Quantity</dt><dd>{{ order.quantity }}</dd>
+            <dt>Delivery Date</dt><dd>{{ order.delivery_date|default:"-" }}</dd>
+            <dt>GST</dt><dd>{{ order.gst_percent|floatformat:2 }}%</dd>
+            <dt>Notes</dt><dd>{{ order.notes|default:"-" }}</dd>
+        </dl>
+        {% if is_staff_role %}
+            <div class="inline-actions">
+                <a class="btn btn-primary btn-sm" href="{% url 'measurement-form' order.pk %}">Measurement</a>
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'payment-for-order' order.pk %}">Record Payment</a>
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'invoice-for-order' order.pk %}">Generate Bill</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Measurement</h2>
+        </div>
+        {% if order.measurement %}
+            <dl class="detail-list">
+                <dt>Length</dt><dd>{{ order.measurement.length|floatformat:2 }} {{ order.measurement.unit }}</dd>
+                <dt>Width</dt><dd>{{ order.measurement.width|floatformat:2 }} {{ order.measurement.unit }}</dd>
+                <dt>Height</dt><dd>{{ order.measurement.height|floatformat:2 }} {{ order.measurement.unit }}</dd>
+                <dt>Thickness</dt><dd>{{ order.measurement.thickness|floatformat:2 }} {{ order.measurement.unit }}</dd>
+                <dt>Area</dt><dd>{{ order.measurement.area_sqft|floatformat:2 }} sq ft</dd>
+                <dt>Material Required</dt><dd>{{ order.measurement.material_required|floatformat:2 }}</dd>
+            </dl>
+        {% else %}
+            <p class="text-muted">Measurement abhi add nahi hua.</p>
+            <a class="btn btn-primary btn-sm" href="{% url 'measurement-form' order.pk %}">Add Measurement</a>
+        {% endif %}
+    </div>
+</section>
+
+<section class="two-column mt-4">
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Assigned Work</h2>
+            {% if is_admin_role %}
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'assignment-add' %}">Assign</a>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Worker</th>
+                        <th>Start</th>
+                        <th>Finish</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for assignment in order.assignments.all %}
+                    <tr>
+                        <td>{{ assignment.worker.name }}</td>
+                        <td>{{ assignment.start_date }}</td>
+                        <td>{{ assignment.expected_finish_date|default:"-" }}</td>
+                        <td>{{ assignment.get_status_display }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-muted">Worker assignment abhi nahi hai.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Payments</h2>
+            {% if is_staff_role %}
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'payment-for-order' order.pk %}">Add Payment</a>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Advance</td>
+                        <td>Order</td>
+                        <td>Rs. {{ order.advance_payment|floatformat:2 }}</td>
+                    </tr>
+                {% for payment in order.payments.all %}
+                    <tr>
+                        <td>{{ payment.payment_date }}</td>
+                        <td>{{ payment.get_method_display }}</td>
+                        <td>Rs. {{ payment.amount|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3" class="text-muted">Additional payment abhi nahi hai.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

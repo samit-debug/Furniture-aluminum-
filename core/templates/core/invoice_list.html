@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Billing{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        {% include "core/_search.html" %}
+        <a class="btn btn-primary btn-sm" href="{% url 'invoice-add' %}">Create Bill</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Invoice</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Order</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for invoice in invoices %}
+                <tr>
+                    <td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.invoice_number }}</a></td>
+                    <td>{{ invoice.issue_date }}</td>
+                    <td>{{ invoice.order.customer.name }}</td>
+                    <td>#{{ invoice.order.pk }} {{ invoice.order.product_name }}</td>
+                    <td>Rs. {{ invoice.final_total|floatformat:2 }}</td>
+                    <td>{{ invoice.order.payment_status }}</td>
+                    <td><a class="btn btn-outline-secondary btn-sm" href="{% url 'invoice-detail' invoice.pk %}">View</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-muted">Bill record abhi empty hai.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "core/_pagination.html" %}
+</section>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ business_profile.shop_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core/styles.css' %}">
+</head>
+<body class="public-body">
+<header class="public-header">
+    <nav class="public-nav">
+        <a class="brand public-brand" href="{% url 'public-catalog' %}">
+            {% if business_profile.logo %}
+                <img class="brand-logo" src="{{ business_profile.logo.url }}" alt="{{ business_profile.shop_name }}">
+            {% else %}
+                <span class="brand-mark">RRV</span>
+            {% endif %}
+            <span>
+                <strong>{{ business_profile.shop_name }}</strong>
+                <small>Furniture and aluminum work</small>
+            </span>
+        </a>
+        <div class="public-actions">
+            {% if business_profile.mobile %}
+                <a class="btn btn-outline-light btn-sm" href="tel:{{ business_profile.mobile }}">Call</a>
+            {% endif %}
+            {% if business_profile.whatsapp_number %}
+                <a class="btn btn-light btn-sm" target="_blank" href="https://wa.me/{{ business_profile.whatsapp_number }}">WhatsApp</a>
+            {% endif %}
+            <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Admin Login</a>
+        </div>
+    </nav>
+    <section class="public-hero">
+        <h1>{{ business_profile.shop_name }}</h1>
+        <p>Aluminum window, door, partition, furniture, sofa, table, wardrobe, kitchen cabinet and custom work.</p>
+    </section>
+</header>
+
+<main class="public-main">
+    {% if featured_products %}
+        <section class="public-section">
+            <div class="public-section-head">
+                <h2>Featured Products</h2>
+            </div>
+            <div class="catalog-grid">
+                {% for product in featured_products %}
+                    <article class="catalog-card">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% endif %}
+                        <div>
+                            <span>{{ product.get_category_display }}</span>
+                            <h3>{{ product.name }}</h3>
+                            <p>{{ product.description|default:"Custom size and design available."|truncatechars:120 }}</p>
+                            {% if product.default_rate %}
+                                <strong>Starting Rs. {{ product.default_rate|floatformat:2 }}</strong>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="public-section">
+        <div class="public-section-head">
+            <h2>Products & Services</h2>
+        </div>
+        <div class="catalog-grid">
+            {% for product in products %}
+                <article class="catalog-card">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% endif %}
+                    <div>
+                        <span>{{ product.get_category_display }}</span>
+                        <h3>{{ product.name }}</h3>
+                        <p>{{ product.description|default:"Made as per customer measurement and requirement."|truncatechars:130 }}</p>
+                        {% if product.default_rate %}
+                            <strong>Starting Rs. {{ product.default_rate|floatformat:2 }}</strong>
+                        {% endif %}
+                    </div>
+                </article>
+            {% empty %}
+                <p class="text-muted">Admin se products live karne ke baad yaha dikhne lagenge.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="public-contact">
+        <h2>Contact</h2>
+        <p>{{ business_profile.address|default:"Address admin settings me add karein." }}</p>
+        {% if business_profile.mobile %}<p>Mobile: {{ business_profile.mobile }}</p>{% endif %}
+        {% if business_profile.email %}<p>Email: {{ business_profile.email }}</p>{% endif %}
+    </section>
+</main>
+</body>
+</html>

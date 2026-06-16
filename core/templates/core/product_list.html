@@ -1,0 +1,62 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Products{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        {% include "core/_search.html" %}
+        {% if is_admin_role %}
+            <a class="btn btn-primary btn-sm" href="{% url 'product-add' %}">Add Product</a>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Default Rate</th>
+                    <th>Material Factor</th>
+                    <th>Website</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>
+                        {% if product.image %}
+                            <img class="table-thumb" src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.get_category_display }}</td>
+                    <td>{{ product.get_order_type_display }}</td>
+                    <td>Rs. {{ product.default_rate|floatformat:2 }}</td>
+                    <td>{{ product.material_factor|floatformat:2 }}</td>
+                    <td>
+                        {% if product.show_on_website %}Live{% else %}Hidden{% endif %}
+                        {% if product.featured %}<span class="status-pill status-ready ms-1">Featured</span>{% endif %}
+                    </td>
+                    <td>{% if product.is_active %}Active{% else %}Inactive{% endif %}</td>
+                    <td>
+                        {% if is_admin_role %}
+                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'product-edit' product.pk %}">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="9" class="text-muted">Product category abhi empty hai.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "core/_pagination.html" %}
+</section>
+{% endblock %}

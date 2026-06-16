@@ -1,0 +1,55 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}{{ customer.name }}{% endblock %}
+
+{% block content %}
+<section class="split-summary">
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Customer Details</h2>
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'customer-edit' customer.pk %}">Edit</a>
+        </div>
+        <dl class="detail-list">
+            <dt>Mobile</dt><dd>{{ customer.mobile }}</dd>
+            <dt>Email</dt><dd>{{ customer.email|default:"-" }}</dd>
+            <dt>Address</dt><dd>{{ customer.address }}</dd>
+            <dt>Pending Payment</dt><dd>Rs. {{ customer.pending_payment|floatformat:2 }}</dd>
+        </dl>
+        <div class="inline-actions">
+            <a class="btn btn-outline-primary btn-sm" href="tel:{{ customer.mobile }}">Call</a>
+            <a class="btn btn-outline-success btn-sm" target="_blank" href="https://wa.me/{{ customer.mobile }}">WhatsApp</a>
+            <a class="btn btn-primary btn-sm" href="{% url 'order-add' %}">New Order</a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Order History</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Remaining</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for order in customer.orders.all %}
+                    <tr>
+                        <td><a href="{% url 'order-detail' order.pk %}">#{{ order.pk }} {{ order.product_name }}</a></td>
+                        <td><span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                        <td>Rs. {{ order.net_total|floatformat:2 }}</td>
+                        <td>Rs. {{ order.remaining_amount|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-muted">Is customer ka order history empty hai.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

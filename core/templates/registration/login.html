@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+
+{% block title %}Login - {{ business_profile.shop_name }}{% endblock %}
+
+{% block layout %}
+<main class="login-page">
+    <section class="login-panel">
+        <div class="login-brand">
+            <span class="brand-mark">RRV</span>
+            <div>
+                <h1>{{ business_profile.shop_name }}</h1>
+                <p>Customer, order, stock, billing, payment, and worker management.</p>
+            </div>
+        </div>
+
+        {% if form.errors %}
+            <div class="alert alert-danger">Email/username ya password sahi nahi hai.</div>
+        {% endif %}
+
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            <label for="{{ form.username.id_for_label }}">Email or Username</label>
+            {{ form.username }}
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            {{ form.password }}
+            <button class="btn btn-primary w-100" type="submit">Login</button>
+        </form>
+        {% if debug %}
+            <div class="login-help">
+                <strong>Local admin</strong>
+                <span>Email: samitkumarrai948@gmail.com</span>
+                <span>Username: rajesh</span>
+                <span>Password: vikas&amp;rakesh</span>
+            </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
