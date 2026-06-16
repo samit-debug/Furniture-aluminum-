@@ -161,6 +161,12 @@ def dashboard(request):
     return render(request, "core/dashboard.html", context)
 
 
+@login_required
+@user_passes_test(is_admin_role)
+def admin_control(request):
+    return redirect("dashboard")
+
+
 def public_catalog(request):
     products = Product.objects.filter(is_active=True, show_on_website=True).order_by("-featured", "category", "name")
     context = {

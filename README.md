@@ -52,6 +52,7 @@ Public catalog:
 Important local URLs:
 
 - Login: `http://127.0.0.1:8000/accounts/login/`
+- Admin control: `http://127.0.0.1:8000/control/`
 - Admin panel: `http://127.0.0.1:8000/admin/`
 - Public website: `http://127.0.0.1:8000/catalog/`
 
