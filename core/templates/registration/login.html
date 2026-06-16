@@ -25,6 +25,9 @@
             {{ form.password }}
             <button class="btn btn-primary w-100" type="submit">Login</button>
         </form>
+        <div class="auth-links">
+            <a href="{% url 'password_reset' %}">Forgot password?</a>
+        </div>
         {% if debug %}
             <div class="login-help">
                 <strong>Local admin</strong>

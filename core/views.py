@@ -3,9 +3,15 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import PasswordResetDoneView, PasswordResetView
+from django.conf import settings
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -65,6 +71,34 @@ class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return is_admin_role(self.request.user)
+
+
+class RRVPasswordResetView(PasswordResetView):
+    email_template_name = "registration/password_reset_email.html"
+    subject_template_name = "registration/password_reset_subject.txt"
+    template_name = "registration/password_reset_form.html"
+    success_url = reverse_lazy("password_reset_done")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if settings.DEBUG:
+            links = []
+            for user in form.get_users(form.cleaned_data["email"]):
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                path = reverse("password_reset_confirm", kwargs={"uidb64": uid, "token": token})
+                links.append(self.request.build_absolute_uri(path))
+            self.request.session["debug_reset_links"] = links
+        return response
+
+
+class RRVPasswordResetDoneView(PasswordResetDoneView):
+    template_name = "registration/password_reset_done.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["debug_reset_links"] = self.request.session.get("debug_reset_links", [])
+        return context
 
 
 class ERPListView(LoginRequiredMixin, ListView):

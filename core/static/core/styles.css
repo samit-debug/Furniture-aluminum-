@@ -483,6 +483,13 @@ a:hover {
     border-radius: 6px;
 }
 
+.auth-links {
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+    font-size: 14px;
+}
+
 .login-help {
     display: grid;
     gap: 3px;

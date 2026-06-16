@@ -55,6 +55,13 @@ Important local URLs:
 - Admin panel: `http://127.0.0.1:8000/admin/`
 - Public website: `http://127.0.0.1:8000/catalog/`
 
+Forgot password:
+
+- Open `http://127.0.0.1:8000/accounts/password_reset/`
+- Enter `samitkumarrai948@gmail.com`
+- In local development, the reset link is shown on the next page.
+- On Render/live hosting, configure SMTP environment variables so reset links go by email.
+
 ## Roles
 
 Create users and groups from Django Admin:

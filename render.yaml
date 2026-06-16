@@ -31,6 +31,20 @@ services:
         value: "samitkumarrai948@gmail.com"
       - key: RRV_ADMIN_EMAIL_ALIASES
         value: "samitkumarrai948@gmail.com,rajesh@rrvfurniture.local"
+      - key: EMAIL_BACKEND
+        value: "django.core.mail.backends.smtp.EmailBackend"
+      - key: EMAIL_HOST
+        value: "smtp.gmail.com"
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_USE_TLS
+        value: "True"
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
     disk:
       name: media
       mountPath: /opt/render/project/src/media
