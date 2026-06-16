@@ -28,9 +28,9 @@ services:
       - key: RRV_ADMIN_USERNAME
         value: "rajesh"
       - key: RRV_ADMIN_EMAIL
-        value: "samitkumarrai948@gmail.com"
-      - key: RRV_ADMIN_EMAIL_ALIASES
-        value: "samitkumarrai948@gmail.com,rajesh@rrvfurniture.local"
+        sync: false
+      - key: RRV_ADMIN_PASSWORD
+        sync: false
       - key: EMAIL_BACKEND
         value: "django.core.mail.backends.smtp.EmailBackend"
       - key: EMAIL_HOST

@@ -38,12 +38,10 @@ python manage.py runserver
 
 Open `http://127.0.0.1:8000/`.
 
-Default admin:
+Admin control:
 
-- Username: `rajesh`
-- Email: `samitkumarrai948@gmail.com`
-- Email alias: `rajesh@rrvfurniture.local`
-- Password: `vikas&rakesh`
+- Owner/admin credentials are stored in the database or set through environment variables.
+- Login works with any valid Django user's email or username plus password.
 
 Public catalog:
 
@@ -59,7 +57,7 @@ Important local URLs:
 Forgot password:
 
 - Open `http://127.0.0.1:8000/accounts/password_reset/`
-- Enter `samitkumarrai948@gmail.com`
+- Enter the registered admin/user email.
 - In local development, the reset link is shown on the next page.
 - On Render/live hosting, configure SMTP environment variables so reset links go by email.
 
@@ -89,3 +87,5 @@ Important environment variables:
 - `ALLOWED_HOSTS`
 - `CSRF_TRUSTED_ORIGINS`
 - `DATABASE_URL`
+- `RRV_ADMIN_EMAIL`
+- `RRV_ADMIN_PASSWORD`

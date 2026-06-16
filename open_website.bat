@@ -16,10 +16,6 @@ echo Login:  http://127.0.0.1:8000/accounts/login/
 echo Public: http://127.0.0.1:8000/catalog/
 echo Admin:  http://127.0.0.1:8000/admin/
 echo.
-echo Username: rajesh
-echo Email:    rajesh@rrvfurniture.local
-echo Password: vikas^&rakesh
-echo.
 start "" "http://127.0.0.1:8000/accounts/login/"
 python manage.py runserver 127.0.0.1:8000
 pause

@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
-from django.conf import settings
 
 
 class EmailOrUsernameBackend(ModelBackend):
@@ -16,10 +15,6 @@ class EmailOrUsernameBackend(ModelBackend):
         return None
 
     def _get_user(self, UserModel, identifier):
-        normalized_identifier = identifier.strip().lower()
-        if normalized_identifier in getattr(settings, "RRV_ADMIN_EMAIL_ALIASES", []):
-            return UserModel.objects.filter(username__iexact=settings.RRV_ADMIN_USERNAME).first()
-
         lookup = {"email__iexact": identifier} if "@" in identifier else {"username__iexact": identifier}
         try:
             return UserModel.objects.get(**lookup)

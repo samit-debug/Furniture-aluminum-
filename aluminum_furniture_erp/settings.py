@@ -162,14 +162,4 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() not in {"0", "false", "no", "off"}
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "RRV furniture & aluminum workers <no-reply@rrv.local>")
 
-RRV_ADMIN_USERNAME = os.environ.get("RRV_ADMIN_USERNAME", "rajesh")
-RRV_ADMIN_EMAIL_ALIASES = [
-    email.strip().lower()
-    for email in os.environ.get(
-        "RRV_ADMIN_EMAIL_ALIASES",
-        "rajesh@rrvfurniture.local,samitkumarrai948@gmail.com",
-    ).split(",")
-    if email.strip()
-]
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
