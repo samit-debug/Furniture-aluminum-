@@ -106,3 +106,9 @@ Render deploy notes:
 - `render.yaml` uses `bash build.sh` for install and static collection.
 - Python is pinned with `.python-version`.
 - File uploads are local in development. For permanent production media, add S3 or Cloudinary later.
+
+If Render shows `gunicorn manage.py migrate`, fix the service settings:
+
+- Build Command: `bash build.sh`
+- Pre-Deploy Command: `python manage.py migrate && python manage.py setup_rrv_admin`
+- Start Command: `gunicorn aluminum_furniture_erp.wsgi:application`
