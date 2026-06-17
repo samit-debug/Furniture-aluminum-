@@ -8,8 +8,8 @@
         <div class="login-brand">
             <span class="brand-mark">RRV</span>
             <div>
-                <h1>{{ business_profile.shop_name }}</h1>
-                <p>Customer, order, stock, billing, payment, and worker management.</p>
+                <h1>{{ login_title|default:business_profile.shop_name }}</h1>
+                <p>{{ login_subtitle|default:"Customer, order, stock, billing, payment, and worker management." }}</p>
             </div>
         </div>
 

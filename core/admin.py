@@ -7,6 +7,7 @@ from .models import (
     Measurement,
     Order,
     Payment,
+    PasswordResetOTP,
     Product,
     Report,
     Stock,
@@ -40,6 +41,14 @@ class ProductAdmin(admin.ModelAdmin):
     )
     list_filter = ("category", "order_type", "show_on_website", "featured", "is_active")
     search_fields = ("name",)
+
+
+@admin.register(PasswordResetOTP)
+class PasswordResetOTPAdmin(admin.ModelAdmin):
+    list_display = ("email", "user", "created_at", "expires_at", "used", "attempts")
+    list_filter = ("used", "created_at")
+    search_fields = ("email", "user__username", "user__email")
+    readonly_fields = ("code", "created_at")
 
 
 class MeasurementInline(admin.StackedInline):

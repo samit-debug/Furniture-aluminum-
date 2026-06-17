@@ -1,17 +1,18 @@
+import secrets
+from datetime import timedelta
 from decimal import Decimal
 
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import PasswordResetDoneView, PasswordResetView
+from django.contrib.auth.views import LoginView
 from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -20,6 +21,8 @@ from .forms import (
     CustomerForm,
     InvoiceForm,
     MeasurementForm,
+    OTPPasswordResetRequestForm,
+    OTPPasswordResetVerifyForm,
     OrderForm,
     PaymentForm,
     ProductForm,
@@ -34,6 +37,7 @@ from .models import (
     Invoice,
     Order,
     Payment,
+    PasswordResetOTP,
     Product,
     Report,
     Stock,
@@ -63,6 +67,15 @@ def is_staff_role(user):
     )
 
 
+def is_smtp_configured():
+    return (
+        settings.EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend"
+        and bool(settings.EMAIL_HOST)
+        and bool(settings.EMAIL_HOST_USER)
+        and bool(settings.EMAIL_HOST_PASSWORD)
+    )
+
+
 class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return is_staff_role(self.request.user)
@@ -73,32 +86,109 @@ class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
         return is_admin_role(self.request.user)
 
 
-class RRVPasswordResetView(PasswordResetView):
-    email_template_name = "registration/password_reset_email.html"
-    subject_template_name = "registration/password_reset_subject.txt"
-    template_name = "registration/password_reset_form.html"
-    success_url = reverse_lazy("password_reset_done")
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        if settings.DEBUG:
-            links = []
-            for user in form.get_users(form.cleaned_data["email"]):
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                token = default_token_generator.make_token(user)
-                path = reverse("password_reset_confirm", kwargs={"uidb64": uid, "token": token})
-                links.append(self.request.build_absolute_uri(path))
-            self.request.session["debug_reset_links"] = links
-        return response
-
-
-class RRVPasswordResetDoneView(PasswordResetDoneView):
-    template_name = "registration/password_reset_done.html"
+class RRVLoginView(LoginView):
+    template_name = "registration/login.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["debug_reset_links"] = self.request.session.get("debug_reset_links", [])
+        context.setdefault("login_title", "Login")
+        context.setdefault("login_subtitle", "Customer, order, stock, billing, payment, and worker management.")
         return context
+
+
+class AdminControlLoginView(RRVLoginView):
+    def get_success_url(self):
+        return self.get_redirect_url() or reverse("dashboard")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["login_title"] = "Admin Control Login"
+        context["login_subtitle"] = "Owner/admin control ke liye email ya username se login karo."
+        return context
+
+
+def password_reset_request(request):
+    form = OTPPasswordResetRequestForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        email = form.cleaned_data["email"].strip().lower()
+        user = get_user_model().objects.filter(email__iexact=email, is_active=True).first()
+
+        if user:
+            PasswordResetOTP.objects.filter(user=user, used=False).update(used=True)
+            code = f"{secrets.randbelow(1000000):06d}"
+            PasswordResetOTP.objects.create(
+                user=user,
+                email=email,
+                code=code,
+                expires_at=timezone.now() + timedelta(minutes=10),
+            )
+            request.session["reset_email"] = email
+            if settings.DEBUG:
+                request.session["debug_reset_otp"] = code
+
+            profile = BusinessProfile.get_solo()
+            subject = f"{profile.shop_name} password reset OTP"
+            message = (
+                f"Your password reset OTP is {code}.\n\n"
+                "Ye OTP 10 minute tak valid hai. Agar tumne request nahi ki, is message ko ignore karo."
+            )
+            try:
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)
+            except Exception as exc:
+                messages.error(request, f"OTP email send nahi hua. SMTP/email settings check karo. Error: {exc}")
+                return render(
+                    request,
+                    "registration/password_reset_form.html",
+                    {"form": form, "smtp_configured": is_smtp_configured()},
+                )
+
+        messages.success(request, "Agar email registered hai to OTP mail par bhej diya gaya hai.")
+        return redirect("password_reset_verify")
+
+    return render(request, "registration/password_reset_form.html", {"form": form, "smtp_configured": is_smtp_configured()})
+
+
+def password_reset_verify(request):
+    initial_email = request.session.get("reset_email", "")
+    form = OTPPasswordResetVerifyForm(request.POST or None, initial={"email": initial_email})
+    debug_otp = request.session.get("debug_reset_otp") if settings.DEBUG else None
+
+    if request.method == "POST" and form.is_valid():
+        email = form.cleaned_data["email"].strip().lower()
+        code = form.cleaned_data["code"]
+        otp = PasswordResetOTP.objects.filter(email__iexact=email, code=code, used=False).select_related("user").first()
+
+        if not otp:
+            latest = PasswordResetOTP.objects.filter(email__iexact=email, used=False).first()
+            if latest:
+                latest.attempts += 1
+                if latest.attempts >= 5:
+                    latest.used = True
+                latest.save(update_fields=["attempts", "used"])
+            form.add_error("code", "OTP galat hai.")
+        elif otp.is_expired:
+            otp.used = True
+            otp.save(update_fields=["used"])
+            form.add_error("code", "OTP expire ho gaya hai. Naya OTP request karo.")
+        elif otp.attempts >= 5:
+            otp.used = True
+            otp.save(update_fields=["used"])
+            form.add_error("code", "OTP attempts limit cross ho gayi. Naya OTP request karo.")
+        else:
+            otp.user.set_password(form.cleaned_data["new_password1"])
+            otp.user.save(update_fields=["password"])
+            otp.used = True
+            otp.save(update_fields=["used"])
+            request.session.pop("reset_email", None)
+            request.session.pop("debug_reset_otp", None)
+            messages.success(request, "Password change ho gaya. Ab new password se login karo.")
+            return redirect("login")
+
+    return render(
+        request,
+        "registration/password_reset_verify.html",
+        {"form": form, "debug_otp": debug_otp},
+    )
 
 
 class ERPListView(LoginRequiredMixin, ListView):
@@ -161,8 +251,8 @@ def dashboard(request):
     return render(request, "core/dashboard.html", context)
 
 
-@login_required
-@user_passes_test(is_admin_role)
+@login_required(login_url="admin-control-login")
+@user_passes_test(is_admin_role, login_url="admin-control-login")
 def admin_control(request):
     return redirect("dashboard")
 

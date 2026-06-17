@@ -27,6 +27,13 @@ Easy way on Windows:
 2. Keep the command window open.
 3. Chrome/browser will open the login page automatically.
 
+OTP email setup:
+
+1. Double-click `setup_email.bat`.
+2. Enter Gmail address.
+3. Enter Gmail App Password.
+4. Restart `open_website.bat`.
+
 Manual way:
 
 ```powershell
@@ -58,8 +65,9 @@ Forgot password:
 
 - Open `http://127.0.0.1:8000/accounts/password_reset/`
 - Enter the registered admin/user email.
-- In local development, the reset link is shown on the next page.
-- On Render/live hosting, configure SMTP environment variables so reset links go by email.
+- The system sends a 6 digit OTP by email.
+- In local development, if SMTP is not configured, the OTP is also shown on the verify page for testing.
+- On Render/live hosting, configure SMTP environment variables so OTP emails go to the real mailbox.
 
 ## Roles
 

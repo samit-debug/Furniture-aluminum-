@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.password_validation import validate_password
 
 from .models import (
     BusinessProfile,
@@ -36,6 +37,44 @@ class CustomerForm(BootstrapModelForm):
     class Meta:
         model = Customer
         fields = ["name", "mobile", "address", "email"]
+
+
+class OTPPasswordResetRequestForm(forms.Form):
+    email = forms.EmailField(
+        label="Registered Email",
+        widget=forms.EmailInput(attrs={"class": "form-control", "autocomplete": "email"}),
+    )
+
+
+class OTPPasswordResetVerifyForm(forms.Form):
+    email = forms.EmailField(widget=forms.HiddenInput())
+    code = forms.CharField(
+        label="OTP",
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "one-time-code"}),
+    )
+    new_password1 = forms.CharField(
+        label="New Password",
+        widget=forms.PasswordInput(attrs={"class": "form-control", "autocomplete": "new-password"}),
+    )
+    new_password2 = forms.CharField(
+        label="Confirm Password",
+        widget=forms.PasswordInput(attrs={"class": "form-control", "autocomplete": "new-password"}),
+    )
+
+    def clean_code(self):
+        return self.cleaned_data["code"].strip()
+
+    def clean(self):
+        cleaned = super().clean()
+        password1 = cleaned.get("new_password1")
+        password2 = cleaned.get("new_password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("New password aur confirm password match nahi kar rahe.")
+        if password1:
+            validate_password(password1)
+        return cleaned
 
 
 class BusinessProfileForm(BootstrapModelForm):

@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
+    path("control/login/", views.AdminControlLoginView.as_view(), name="admin-control-login"),
     path("control/", views.admin_control, name="admin-control"),
     path("catalog/", views.public_catalog, name="public-catalog"),
     path("settings/", views.business_settings, name="business-settings"),

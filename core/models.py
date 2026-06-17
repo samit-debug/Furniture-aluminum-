@@ -54,6 +54,26 @@ class BusinessProfile(models.Model):
         return profile
 
 
+class PasswordResetOTP(models.Model):
+    user = models.ForeignKey(User, related_name="password_reset_otps", on_delete=models.CASCADE)
+    email = models.EmailField(db_index=True)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    used = models.BooleanField(default=False)
+    attempts = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"OTP for {self.email}"
+
+    @property
+    def is_expired(self):
+        return timezone.now() >= self.expires_at
+
+
 class Product(models.Model):
     ORDER_TYPE_ALUMINUM = "aluminum"
     ORDER_TYPE_FURNITURE = "furniture"
