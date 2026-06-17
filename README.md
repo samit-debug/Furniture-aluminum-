@@ -97,3 +97,12 @@ Important environment variables:
 - `DATABASE_URL`
 - `RRV_ADMIN_EMAIL`
 - `RRV_ADMIN_PASSWORD`
+- `EMAIL_HOST_USER`
+- `EMAIL_HOST_PASSWORD`
+- `DEFAULT_FROM_EMAIL`
+
+Render deploy notes:
+
+- `render.yaml` uses `bash build.sh` for install and static collection.
+- Python is pinned with `.python-version`.
+- File uploads are local in development. For permanent production media, add S3 or Cloudinary later.

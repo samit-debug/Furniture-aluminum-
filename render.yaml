@@ -8,10 +8,12 @@ services:
   - type: web
     name: rrv-furniture-aluminum-workers
     runtime: python
+    branch: main
     plan: free
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input"
+    buildCommand: "bash build.sh"
     preDeployCommand: "python manage.py migrate && python manage.py setup_rrv_admin"
     startCommand: "gunicorn aluminum_furniture_erp.wsgi:application"
+    healthCheckPath: /catalog/
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -21,6 +23,8 @@ services:
         generateValue: true
       - key: DEBUG
         value: "False"
+      - key: PYTHON_VERSION
+        value: "3.13.5"
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
       - key: WEB_CONCURRENCY
@@ -45,7 +49,3 @@ services:
         sync: false
       - key: DEFAULT_FROM_EMAIL
         sync: false
-    disk:
-      name: media
-      mountPath: /opt/render/project/src/media
-      sizeGB: 1
