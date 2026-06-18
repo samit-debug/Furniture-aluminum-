@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Contacts{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        {% include "core/_search.html" %}
+        <a class="btn btn-primary btn-sm" href="{% url 'team-contact-add' %}">Add Contact</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>Role</th>
+                    <th>Website</th>
+                    <th>Primary</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for contact in contacts %}
+                <tr>
+                    <td>{{ contact.name }}</td>
+                    <td>{{ contact.mobile }}</td>
+                    <td>{{ contact.get_role_display }}</td>
+                    <td>{% if contact.show_on_website %}Visible{% else %}Hidden{% endif %}</td>
+                    <td>{% if contact.is_primary %}Yes{% else %}No{% endif %}</td>
+                    <td class="table-actions">
+                        <a class="btn btn-outline-primary btn-sm" href="tel:{{ contact.mobile }}">Call</a>
+                        {% if contact.whatsapp_enabled %}
+                            <a class="btn btn-outline-success btn-sm" target="_blank" href="https://wa.me/91{{ contact.mobile }}">WhatsApp</a>
+                        {% endif %}
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'team-contact-edit' contact.pk %}">Edit</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-muted">Contact record empty hai.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "core/_pagination.html" %}
+</section>
+{% endblock %}

@@ -25,14 +25,18 @@
             <a href="{% url 'assignment-list' %}">Work Assignment</a>
             {% if is_staff_role %}
                 <a href="{% url 'customer-list' %}">Customers</a>
+                <a href="{% url 'enquiry-list' %}">Enquiries</a>
                 <a href="{% url 'product-list' %}">Products</a>
                 <a href="{% url 'payment-list' %}">Payments</a>
                 <a href="{% url 'invoice-list' %}">Billing</a>
                 <a href="{% url 'report-list' %}">Reports</a>
             {% endif %}
             {% if is_admin_role %}
+                <a href="{% url 'admin-control' %}">Owner Control</a>
                 <a href="{% url 'stock-list' %}">Stock</a>
                 <a href="{% url 'worker-list' %}">Workers</a>
+                <a href="{% url 'team-contact-list' %}">Contacts</a>
+                <a href="{% url 'transaction-list' %}">Transactions</a>
                 <a href="{% url 'business-settings' %}">Business Settings</a>
                 <a href="{% url 'admin:index' %}">Django Admin</a>
             {% endif %}

@@ -1,19 +1,54 @@
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.password_validation import validate_password
 
 from .models import (
     BusinessProfile,
     Customer,
+    FinancialTransaction,
     Invoice,
     Measurement,
     Order,
     Payment,
+    PublicEnquiry,
     Product,
     Report,
     Stock,
+    TeamContact,
     WorkAssignment,
     Worker,
 )
+
+
+class RRVAuthenticationForm(AuthenticationForm):
+    username = forms.CharField(
+        label="Email or Username",
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "autocomplete": "username",
+                "placeholder": "email@example.com or username",
+            }
+        ),
+    )
+    password = forms.CharField(
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "autocomplete": "current-password",
+                "placeholder": "Enter password",
+            }
+        ),
+    )
+    error_messages = {
+        "invalid_login": "Email/username ya password sahi nahi hai.",
+        "inactive": "Ye account inactive hai.",
+    }
+
+    def clean_username(self):
+        return self.cleaned_data["username"].strip()
 
 
 class BootstrapModelForm(forms.ModelForm):
@@ -80,7 +115,43 @@ class OTPPasswordResetVerifyForm(forms.Form):
 class BusinessProfileForm(BootstrapModelForm):
     class Meta:
         model = BusinessProfile
-        fields = ["shop_name", "owner_name", "mobile", "whatsapp_number", "email", "address", "gst_number", "logo"]
+        fields = [
+            "shop_name",
+            "owner_name",
+            "tagline",
+            "mobile",
+            "whatsapp_number",
+            "email",
+            "address",
+            "service_area",
+            "gst_number",
+            "upi_id",
+            "bank_name",
+            "account_holder_name",
+            "account_number",
+            "ifsc_code",
+            "payment_qr",
+            "show_payment_details",
+            "logo",
+        ]
+
+
+class TeamContactForm(BootstrapModelForm):
+    class Meta:
+        model = TeamContact
+        fields = ["name", "mobile", "role", "whatsapp_enabled", "is_primary", "show_on_website", "notes"]
+
+
+class PublicEnquiryForm(BootstrapModelForm):
+    class Meta:
+        model = PublicEnquiry
+        fields = ["name", "mobile", "email", "city", "service_required", "preferred_contact", "message"]
+
+
+class PublicEnquiryAdminForm(BootstrapModelForm):
+    class Meta:
+        model = PublicEnquiry
+        fields = ["name", "mobile", "email", "city", "service_required", "preferred_contact", "status", "admin_note"]
 
 
 class ProductForm(BootstrapModelForm):
@@ -170,6 +241,28 @@ class PaymentForm(BootstrapModelForm):
     class Meta:
         model = Payment
         fields = ["order", "amount", "method", "payment_date", "reference_number", "note"]
+
+
+class FinancialTransactionForm(BootstrapModelForm):
+    date_fields = {"transaction_date"}
+
+    class Meta:
+        model = FinancialTransaction
+        fields = [
+            "transaction_type",
+            "category",
+            "title",
+            "amount",
+            "method",
+            "transaction_date",
+            "customer",
+            "worker",
+            "order",
+            "party_name",
+            "reference_number",
+            "attachment",
+            "note",
+        ]
 
 
 class InvoiceForm(BootstrapModelForm):

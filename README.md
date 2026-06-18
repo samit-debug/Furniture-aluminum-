@@ -6,11 +6,15 @@ Django based management system for aluminum and furniture workshop records.
 
 - Login and Django Admin roles
 - Email or username based login
+- Owner Control web panel for website/content/business management
 - Dashboard with order, sales, payment, and low-stock metrics
 - Business settings for shop name, owner, contact, GST, and logo
 - Customer management with order history and pending payment
 - Product management with image upload, featured flag, and website visibility
 - Public product catalog controlled from admin/product page
+- Public enquiry form with call/WhatsApp follow-up status
+- Team contact management for website phone numbers
+- Income/expense transaction ledger for material, wage, supplier, and other payments
 - Order management with measurement, status, payment, and bill links
 - Measurement auto calculation for area and material requirement
 - Stock management with low-stock alert
@@ -57,7 +61,7 @@ Public catalog:
 Important local URLs:
 
 - Login: `http://127.0.0.1:8000/accounts/login/`
-- Admin control: `http://127.0.0.1:8000/control/`
+- Owner/Admin control: `http://127.0.0.1:8000/control/`
 - Admin panel: `http://127.0.0.1:8000/admin/`
 - Public website: `http://127.0.0.1:8000/catalog/`
 
@@ -85,8 +89,9 @@ This project includes `render.yaml` for Render Blueprint deployment.
 2. Open Render Dashboard.
 3. Create a new Blueprint and select the GitHub repository.
 4. Render will create the web service and PostgreSQL database.
-5. The pre-deploy command runs migrations and creates the `rajesh` admin account.
-6. After deployment, open the service URL and login with the admin account.
+5. Add `RRV_ADMIN_EMAIL` and `RRV_ADMIN_PASSWORD` in Render environment variables.
+6. The pre-deploy command runs migrations and creates/updates the `rajesh` admin account.
+7. After deployment, open the service URL and login with the admin email/username and password.
 
 Important environment variables:
 
@@ -104,6 +109,7 @@ Important environment variables:
 Render deploy notes:
 
 - `render.yaml` uses `bash build.sh` for install and static collection.
+- Live login will not work until `RRV_ADMIN_EMAIL` and `RRV_ADMIN_PASSWORD` are set on Render.
 - Python is pinned with `.python-version`.
 - File uploads are local in development. For permanent production media, add S3 or Cloudinary later.
 

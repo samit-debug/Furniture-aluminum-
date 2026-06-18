@@ -23,39 +23,113 @@
             </span>
         </a>
         <div class="public-actions">
-            {% if business_profile.mobile %}
-                <a class="btn btn-outline-light btn-sm" href="tel:{{ business_profile.mobile }}">Call</a>
-            {% endif %}
-            {% if business_profile.whatsapp_number %}
-                <a class="btn btn-light btn-sm" target="_blank" href="https://wa.me/{{ business_profile.whatsapp_number }}">WhatsApp</a>
-            {% endif %}
+            <a class="btn btn-outline-light btn-sm" href="#services">Services</a>
+            <a class="btn btn-outline-light btn-sm" href="#products">Products</a>
+            <a class="btn btn-outline-light btn-sm" href="#contact">Contact</a>
+            <a class="btn btn-light btn-sm" href="#enquiry">Get Quote</a>
             <a class="btn btn-outline-light btn-sm" href="{% url 'admin-control' %}">Admin Control</a>
         </div>
     </nav>
     <section class="public-hero">
-        <h1>{{ business_profile.shop_name }}</h1>
-        <p>Aluminum window, door, partition, furniture, sofa, table, wardrobe, kitchen cabinet and custom work.</p>
+        <div class="hero-copy">
+            <span class="hero-kicker">Furniture | Aluminium | Glass | Interior Work</span>
+            <h1>{{ business_profile.shop_name }}</h1>
+            <p>{{ business_profile.tagline }}</p>
+            <div class="public-hero-actions">
+                <a class="btn btn-primary btn-lg" href="#enquiry">Request Quote</a>
+                {% if primary_contact %}
+                    <a class="btn btn-light btn-lg" href="tel:{{ primary_contact.mobile }}">Call {{ primary_contact.name }}</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="hero-metrics" aria-label="Business highlights">
+            <article>
+                <strong>All India</strong>
+                <span>{{ business_profile.service_area }}</span>
+            </article>
+            <article>
+                <strong>Custom Size</strong>
+                <span>Measurement based making and fitting</span>
+            </article>
+            <article>
+                <strong>Owner Control</strong>
+                <span>Products, enquiries and payments managed online</span>
+            </article>
+        </div>
     </section>
 </header>
 
 <main class="public-main">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="public-trust" aria-label="Why customers choose us">
+        <article>
+            <strong>Premium Finish</strong>
+            <span>Clean edge, accurate fitting and professional material selection.</span>
+        </article>
+        <article>
+            <strong>Site to Delivery</strong>
+            <span>Measurement, quote, fabrication, fitting and billing in one flow.</span>
+        </article>
+        <article>
+            <strong>Direct Contact</strong>
+            <span>Call or WhatsApp the owner/team for quick quote and support.</span>
+        </article>
+    </section>
+
+    <section class="public-section" id="services">
+        <div class="public-section-head">
+            <div>
+                <span class="section-kicker">What We Make</span>
+                <h2>Furniture and aluminium work made to measurement</h2>
+            </div>
+            <a class="btn btn-outline-primary btn-sm" href="#enquiry">Plan Your Work</a>
+        </div>
+        <div class="service-grid">
+            {% for tile in service_tiles %}
+                <article class="service-card">
+                    <div class="service-visual {{ tile.visual_class }}" aria-hidden="true">
+                        <span></span>
+                    </div>
+                    <h3>{{ tile.title }}</h3>
+                    <p>{{ tile.text }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+
     {% if featured_products %}
-        <section class="public-section">
+        <section class="public-section" id="featured">
             <div class="public-section-head">
-                <h2>Featured Products</h2>
+                <div>
+                    <span class="section-kicker">Featured</span>
+                    <h2>Popular work samples</h2>
+                </div>
             </div>
             <div class="catalog-grid">
                 {% for product in featured_products %}
                     <article class="catalog-card">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                        {% endif %}
-                        <div>
+                        <div class="catalog-media">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <div class="product-visual category-{{ product.category }}" aria-hidden="true">
+                                    <span>{{ product.get_category_display }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="catalog-content">
                             <span>{{ product.get_category_display }}</span>
                             <h3>{{ product.name }}</h3>
                             <p>{{ product.description|default:"Custom size and design available."|truncatechars:120 }}</p>
                             {% if product.default_rate %}
                                 <strong>Starting Rs. {{ product.default_rate|floatformat:2 }}</strong>
+                            {% else %}
+                                <strong>Rate after measurement</strong>
                             {% endif %}
                         </div>
                     </article>
@@ -64,36 +138,141 @@
         </section>
     {% endif %}
 
-    <section class="public-section">
+    <section class="public-section" id="products">
         <div class="public-section-head">
-            <h2>Products & Services</h2>
+            <div>
+                <span class="section-kicker">Catalog</span>
+                <h2>Products & Services</h2>
+            </div>
+            <a class="btn btn-outline-primary btn-sm" href="#contact">Talk To Team</a>
         </div>
         <div class="catalog-grid">
             {% for product in products %}
                 <article class="catalog-card">
-                    {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                    {% endif %}
-                    <div>
+                    <div class="catalog-media">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="product-visual category-{{ product.category }}" aria-hidden="true">
+                                <span>{{ product.get_category_display }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="catalog-content">
                         <span>{{ product.get_category_display }}</span>
                         <h3>{{ product.name }}</h3>
                         <p>{{ product.description|default:"Made as per customer measurement and requirement."|truncatechars:130 }}</p>
                         {% if product.default_rate %}
                             <strong>Starting Rs. {{ product.default_rate|floatformat:2 }}</strong>
+                        {% else %}
+                            <strong>Rate after measurement</strong>
                         {% endif %}
                     </div>
                 </article>
             {% empty %}
-                <p class="text-muted">Admin se products live karne ke baad yaha dikhne lagenge.</p>
+                <p class="text-muted">Admin Control se products live karne ke baad yaha dikhne lagenge.</p>
             {% endfor %}
         </div>
     </section>
 
-    <section class="public-contact">
-        <h2>Contact</h2>
-        <p>{{ business_profile.address|default:"Address admin settings me add karein." }}</p>
-        {% if business_profile.mobile %}<p>Mobile: {{ business_profile.mobile }}</p>{% endif %}
-        {% if business_profile.email %}<p>Email: {{ business_profile.email }}</p>{% endif %}
+    <section class="public-section process-section">
+        <div class="public-section-head">
+            <div>
+                <span class="section-kicker">Work Flow</span>
+                <h2>How your order moves</h2>
+            </div>
+        </div>
+        <div class="process-grid">
+            {% for step_no, title, text in process_steps %}
+                <article>
+                    <span>{{ step_no }}</span>
+                    <strong>{{ title }}</strong>
+                    <p>{{ text }}</p>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="public-section enquiry-section" id="enquiry">
+        <div class="quote-copy">
+            <span class="section-kicker">Quote Request</span>
+            <h2>Apna furniture ya aluminium work detail bhejein</h2>
+            <p>Service, city aur contact preference submit karein. Team measurement, design aur rate ke liye jaldi contact karegi.</p>
+            {% if primary_contact %}
+                <a class="btn btn-outline-primary" href="https://wa.me/91{{ primary_contact.mobile }}" target="_blank">WhatsApp Direct</a>
+            {% endif %}
+        </div>
+        <form class="public-form" method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                {% for field in enquiry_form %}
+                    <div class="field-row">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <div class="field-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="btn btn-primary" type="submit">Submit Enquiry</button>
+        </form>
+    </section>
+
+    {% if business_profile.show_payment_details %}
+        <section class="public-section payment-section" id="payment">
+            <div class="public-section-head">
+                <div>
+                    <span class="section-kicker">Payments</span>
+                    <h2>Payment Options</h2>
+                </div>
+            </div>
+            <div class="payment-grid">
+                {% if business_profile.upi_id %}
+                    <article>
+                        <span>UPI</span>
+                        <strong>{{ business_profile.upi_id }}</strong>
+                    </article>
+                {% endif %}
+                {% if business_profile.bank_name or business_profile.account_number %}
+                    <article>
+                        <span>Bank Transfer</span>
+                        {% if business_profile.account_holder_name %}<p>Account: {{ business_profile.account_holder_name }}</p>{% endif %}
+                        {% if business_profile.bank_name %}<p>Bank: {{ business_profile.bank_name }}</p>{% endif %}
+                        {% if business_profile.account_number %}<p>A/C: {{ business_profile.account_number }}</p>{% endif %}
+                        {% if business_profile.ifsc_code %}<p>IFSC: {{ business_profile.ifsc_code }}</p>{% endif %}
+                    </article>
+                {% endif %}
+                {% if business_profile.payment_qr %}
+                    <article>
+                        <span>Scan QR</span>
+                        <img class="payment-qr" src="{{ business_profile.payment_qr.url }}" alt="Payment QR">
+                    </article>
+                {% endif %}
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="public-contact" id="contact">
+        <div>
+            <span class="section-kicker">Contact</span>
+            <h2>Talk to RRV team</h2>
+            <p>{{ business_profile.address|default:"Address admin settings me add karein." }}</p>
+            {% if business_profile.mobile %}<p>Mobile: {{ business_profile.mobile }}</p>{% endif %}
+            {% if business_profile.email %}<p>Email: {{ business_profile.email }}</p>{% endif %}
+        </div>
+        <div class="contact-grid">
+            {% for contact in team_contacts %}
+                <article>
+                    <strong>{{ contact.name }}</strong>
+                    <span>{{ contact.get_role_display }}</span>
+                    <a href="tel:{{ contact.mobile }}">{{ contact.mobile }}</a>
+                    {% if contact.whatsapp_enabled %}
+                        <a target="_blank" href="https://wa.me/91{{ contact.mobile }}">WhatsApp</a>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
     </section>
 </main>
 </body>

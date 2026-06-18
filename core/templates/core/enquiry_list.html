@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Enquiries{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        {% include "core/_search.html" %}
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>City</th>
+                    <th>Service</th>
+                    <th>Contact</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for enquiry in enquiries %}
+                <tr>
+                    <td>{{ enquiry.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ enquiry.name }}</td>
+                    <td>{{ enquiry.mobile }}</td>
+                    <td>{{ enquiry.city }}</td>
+                    <td>{{ enquiry.get_service_required_display }}</td>
+                    <td>{{ enquiry.get_preferred_contact_display }}</td>
+                    <td>{{ enquiry.get_status_display }}</td>
+                    <td class="table-actions">
+                        <a class="btn btn-outline-primary btn-sm" href="tel:{{ enquiry.mobile }}">Call</a>
+                        <a class="btn btn-outline-success btn-sm" target="_blank" href="https://wa.me/91{{ enquiry.mobile }}">WhatsApp</a>
+                        <a class="btn btn-outline-secondary btn-sm" href="{% url 'enquiry-edit' enquiry.pk %}">Update</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="8" class="text-muted">Enquiry record empty hai.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "core/_pagination.html" %}
+</section>
+{% endblock %}

@@ -44,6 +44,22 @@
         <span>Low Stock Alert</span>
         <strong>{{ low_stock_items|length }}</strong>
     </article>
+    <article class="metric-card warning">
+        <span>New Enquiries</span>
+        <strong>{{ new_enquiries }}</strong>
+    </article>
+    <article class="metric-card success">
+        <span>Month Income</span>
+        <strong>Rs. {{ month_income|floatformat:2 }}</strong>
+    </article>
+    <article class="metric-card danger">
+        <span>Month Expense</span>
+        <strong>Rs. {{ month_expense|floatformat:2 }}</strong>
+    </article>
+    <article class="metric-card active">
+        <span>Net Balance</span>
+        <strong>Rs. {{ month_net|floatformat:2 }}</strong>
+    </article>
 </section>
 
 <section class="two-column mt-4">
@@ -141,6 +157,43 @@
                 </tr>
             {% empty %}
                 <tr><td colspan="5" class="text-muted">Payment entry abhi nahi hai.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel mt-4">
+    <div class="panel-header">
+        <h2>Recent Enquiries</h2>
+        {% if is_staff_role %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'enquiry-list' %}">View Enquiries</a>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>City</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for enquiry in recent_enquiries %}
+                <tr>
+                    <td>{{ enquiry.created_at|date:"Y-m-d" }}</td>
+                    <td>{{ enquiry.name }}</td>
+                    <td>{{ enquiry.mobile }}</td>
+                    <td>{{ enquiry.city }}</td>
+                    <td>{{ enquiry.get_service_required_display }}</td>
+                    <td>{{ enquiry.get_status_display }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-muted">Abhi koi enquiry nahi hai.</td></tr>
             {% endfor %}
             </tbody>
         </table>

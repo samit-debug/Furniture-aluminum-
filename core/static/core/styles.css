@@ -613,11 +613,11 @@ a:hover {
 }
 
 .public-header {
-    min-height: 420px;
+    min-height: 560px;
     color: #ffffff;
     background:
-        linear-gradient(rgba(18, 32, 51, 0.86), rgba(18, 32, 51, 0.7)),
-        url("https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1800&q=80") center/cover;
+        linear-gradient(90deg, rgba(13, 25, 38, 0.92), rgba(13, 25, 38, 0.62) 54%, rgba(13, 25, 38, 0.18)),
+        url("images/rrv-showroom-hero.png") center/cover;
 }
 
 .public-nav {
@@ -663,10 +663,55 @@ a:hover {
     font-size: 18px;
 }
 
+.public-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+}
+
 .public-main {
     max-width: 1180px;
     margin: 0 auto;
     padding: 30px 20px 46px;
+}
+
+.public-trust {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: -58px;
+}
+
+.public-trust article,
+.payment-grid article,
+.contact-grid article,
+.public-form {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.public-trust article {
+    padding: 18px;
+}
+
+.public-trust strong,
+.public-trust span,
+.contact-grid strong,
+.contact-grid span {
+    display: block;
+}
+
+.public-trust strong {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.public-trust span,
+.contact-grid span {
+    margin-top: 5px;
+    color: var(--muted);
 }
 
 .public-section {
@@ -709,7 +754,7 @@ a:hover {
     background: #e9eef3;
 }
 
-.catalog-card div {
+.catalog-card > div:not(.catalog-media) {
     padding: 14px;
 }
 
@@ -736,6 +781,57 @@ a:hover {
     color: var(--primary-dark);
 }
 
+.public-form {
+    padding: 18px;
+}
+
+.public-form .btn {
+    margin-top: 16px;
+}
+
+.payment-grid,
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.payment-grid article,
+.contact-grid article {
+    padding: 16px;
+}
+
+.payment-grid span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.payment-grid strong {
+    display: block;
+    margin-top: 8px;
+    color: var(--primary-dark);
+    font-size: 18px;
+}
+
+.payment-grid p {
+    margin: 8px 0 0;
+    color: var(--muted);
+}
+
+.payment-qr {
+    width: 150px;
+    max-width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    margin-top: 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #ffffff;
+}
+
 .public-contact {
     margin-top: 30px;
     padding: 20px;
@@ -749,12 +845,459 @@ a:hover {
     color: var(--muted);
 }
 
+.contact-grid {
+    margin-top: 16px;
+}
+
+.contact-grid a {
+    display: inline-block;
+    margin-top: 8px;
+    margin-right: 12px;
+    font-weight: 700;
+}
+
+.control-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+    gap: 18px;
+    align-items: stretch;
+    padding: 22px;
+    color: #ffffff;
+    background:
+        linear-gradient(120deg, rgba(18, 32, 51, 0.96), rgba(17, 100, 102, 0.84)),
+        url("images/rrv-showroom-hero.png") center/cover;
+    border-radius: 8px;
+}
+
+.control-hero h2 {
+    max-width: 820px;
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.16;
+    font-weight: 900;
+}
+
+.control-hero p {
+    max-width: 720px;
+    margin: 12px 0 0;
+    color: #e6eef6;
+}
+
+.control-summary,
+.control-grid,
+.quick-actions {
+    display: grid;
+    gap: 12px;
+}
+
+.control-summary {
+    grid-template-columns: 1fr;
+}
+
+.control-summary article,
+.control-card {
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(216, 222, 230, 0.88);
+    border-radius: 8px;
+}
+
+.control-summary article {
+    padding: 14px;
+}
+
+.control-summary span,
+.control-card span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.control-summary strong {
+    display: block;
+    margin-top: 8px;
+    color: var(--ink);
+    font-size: 22px;
+}
+
+.control-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.control-card {
+    min-height: 172px;
+    padding: 18px;
+    color: var(--ink);
+}
+
+.control-card:hover {
+    border-color: var(--primary);
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.control-card strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 19px;
+    line-height: 1.2;
+}
+
+.control-card p {
+    margin: 10px 0 0;
+    color: var(--muted);
+}
+
+.quick-actions {
+    grid-template-columns: repeat(4, minmax(0, max-content));
+    align-items: center;
+}
+
+.hero-copy {
+    max-width: 760px;
+}
+
+.hero-kicker,
+.section-kicker {
+    display: inline-block;
+    color: #e7b65d;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.section-kicker {
+    color: var(--primary);
+}
+
+.hero-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    width: min(100%, 780px);
+    margin-top: 28px;
+}
+
+.hero-metrics article {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+}
+
+.hero-metrics strong,
+.hero-metrics span {
+    display: block;
+}
+
+.hero-metrics strong {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.hero-metrics span {
+    margin-top: 6px;
+    color: #e8eef5;
+}
+
+.service-grid,
+.process-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.service-card,
+.process-grid article {
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.service-card h3,
+.process-grid strong {
+    display: block;
+    margin: 16px 16px 8px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.service-card p,
+.process-grid p {
+    margin: 0 16px 16px;
+    color: var(--muted);
+}
+
+.service-visual,
+.product-visual {
+    position: relative;
+    min-height: 168px;
+    overflow: hidden;
+    background: #dce4ea;
+}
+
+.service-visual::before,
+.product-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.32), transparent 36%),
+        linear-gradient(90deg, rgba(18, 32, 51, 0.12) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(18, 32, 51, 0.10) 1px, transparent 1px);
+    background-size: auto, 36px 36px, 36px 36px;
+}
+
+.service-visual span,
+.product-visual span {
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    right: 14px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.service-aluminum,
+.category-aluminum_window,
+.category-aluminum_door,
+.category-aluminum_partition,
+.category-aluminum_frame,
+.category-aluminum_rack {
+    background:
+        linear-gradient(135deg, rgba(34, 55, 75, 0.92), rgba(138, 155, 171, 0.78)),
+        url("images/rrv-showroom-hero.png") center/cover;
+}
+
+.service-furniture,
+.category-wooden_bed,
+.category-sofa,
+.category-table,
+.category-chair,
+.category-wardrobe,
+.category-kitchen_cabinet,
+.category-office_furniture,
+.category-custom_design {
+    background:
+        linear-gradient(135deg, rgba(81, 50, 26, 0.86), rgba(230, 182, 93, 0.38)),
+        url("images/rrv-showroom-hero.png") left center/cover;
+}
+
+.service-glass {
+    background:
+        linear-gradient(135deg, rgba(17, 100, 102, 0.82), rgba(110, 177, 192, 0.58)),
+        url("images/rrv-showroom-hero.png") right center/cover;
+}
+
+.catalog-media img,
+.product-visual {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.catalog-content {
+    padding: 14px;
+}
+
+.process-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.process-grid article {
+    padding-top: 16px;
+}
+
+.process-grid article > span {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-left: 16px;
+    color: #101820;
+    background: #e7b65d;
+    border-radius: 8px;
+    font-weight: 900;
+}
+
+.enquiry-section {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.65fr) minmax(0, 1.35fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.quote-copy {
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.quote-copy h2 {
+    margin-top: 6px;
+}
+
+.quote-copy p {
+    color: var(--muted);
+}
+
+.public-header {
+    display: flex;
+    flex-direction: column;
+    min-height: min(760px, 88vh);
+    background:
+        linear-gradient(90deg, rgba(10, 22, 24, 0.96) 0%, rgba(10, 22, 24, 0.82) 42%, rgba(10, 22, 24, 0.48) 72%, rgba(10, 22, 24, 0.64) 100%),
+        url("images/rrv-showroom-hero.png") center/cover;
+}
+
+.public-nav,
+.public-hero,
+.public-main {
+    max-width: 1220px;
+}
+
+.public-nav {
+    width: 100%;
+}
+
+.public-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: end;
+    gap: 28px;
+    width: 100%;
+    flex: 1;
+    padding: 84px 20px 70px;
+}
+
+.public-hero h1 {
+    max-width: 780px;
+    font-size: 54px;
+}
+
+.hero-metrics {
+    grid-template-columns: 1fr;
+    width: auto;
+    margin-top: 0;
+}
+
+.public-main {
+    padding: 0 20px 52px;
+}
+
+.public-trust {
+    margin-top: -32px;
+}
+
+.public-section {
+    margin-top: 40px;
+}
+
+.public-section h2,
+.public-contact h2 {
+    font-size: 28px;
+}
+
+.catalog-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 308px;
+}
+
+.catalog-media {
+    height: 190px;
+    padding: 0 !important;
+    background: #e9eef3;
+}
+
+.catalog-media img,
+.catalog-media .product-visual {
+    width: 100%;
+    height: 100%;
+}
+
+.catalog-media img {
+    object-fit: cover;
+}
+
+.catalog-content {
+    padding: 14px;
+}
+
+.catalog-content h3 {
+    margin: 6px 0 8px;
+}
+
+.catalog-content p {
+    min-height: 46px;
+}
+
+.product-visual {
+    display: grid;
+    align-items: end;
+    padding: 14px;
+}
+
+.enquiry-section {
+    grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);
+}
+
+.quote-copy {
+    color: #ffffff;
+    background:
+        linear-gradient(135deg, rgba(18, 32, 51, 0.95), rgba(17, 100, 102, 0.86)),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 26px);
+    border: 0;
+}
+
+.quote-copy p {
+    color: #e6eff2;
+}
+
+.public-contact {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+    gap: 18px;
+}
+
+.public-contact .contact-grid {
+    margin-top: 0;
+}
+
 @media (max-width: 1100px) {
     .metric-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .summary-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .control-grid,
+    .service-grid,
+    .process-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .control-hero,
+    .enquiry-section,
+    .public-hero,
+    .public-contact {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-top: 8px;
+    }
+
+    .catalog-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
@@ -820,6 +1363,7 @@ a:hover {
     }
 
     .public-hero {
+        grid-template-columns: 1fr;
         padding-top: 56px;
         padding-bottom: 70px;
     }
@@ -828,8 +1372,28 @@ a:hover {
         font-size: 34px;
     }
 
-    .catalog-grid {
+    .hero-metrics,
+    .control-grid,
+    .service-grid,
+    .process-grid,
+    .quick-actions,
+    .catalog-grid,
+    .public-contact {
         grid-template-columns: 1fr;
+    }
+
+    .public-actions {
+        justify-content: flex-start;
+    }
+
+    .public-trust,
+    .payment-grid,
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .public-trust {
+        margin-top: -36px;
     }
 }
 

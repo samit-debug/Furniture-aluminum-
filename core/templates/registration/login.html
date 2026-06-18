@@ -13,21 +13,37 @@
             </div>
         </div>
 
-        {% if form.errors %}
-            <div class="alert alert-danger">Email/username ya password sahi nahi hai.</div>
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
         {% endif %}
 
         <form method="post" class="login-form">
             {% csrf_token %}
             <label for="{{ form.username.id_for_label }}">Email or Username</label>
             {{ form.username }}
+            {% for error in form.username.errors %}
+                <div class="field-error">{{ error }}</div>
+            {% endfor %}
             <label for="{{ form.password.id_for_label }}">Password</label>
             {{ form.password }}
+            {% for error in form.password.errors %}
+                <div class="field-error">{{ error }}</div>
+            {% endfor %}
             <button class="btn btn-primary w-100" type="submit">Login</button>
         </form>
         <div class="auth-links">
             <a href="{% url 'password_reset' %}">Forgot password?</a>
         </div>
+        {% if login_help %}
+            <div class="login-help">
+                <strong>Login help</strong>
+                <span>{{ login_help }}</span>
+            </div>
+        {% endif %}
     </section>
 </main>
 {% endblock %}

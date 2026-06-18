@@ -1,0 +1,88 @@
+{% extends "core/base.html" %}
+
+{% block page_title %}Owner Control{% endblock %}
+
+{% block content %}
+<section class="control-hero">
+    <div>
+        <p class="eyebrow mb-2">Admin Web Panel</p>
+        <h2>Website, orders, money, workers aur stock ek hi jagah se manage karein.</h2>
+        <p>Yaha se owner live website content, product photos, enquiries, payment details, business profile aur ERP records update kar sakta hai.</p>
+    </div>
+    <div class="control-summary">
+        <article>
+            <span>Live Products</span>
+            <strong>{{ live_products }}</strong>
+        </article>
+        <article>
+            <span>New Enquiries</span>
+            <strong>{{ new_enquiries }}</strong>
+        </article>
+        <article>
+            <span>Pending Payment</span>
+            <strong>Rs. {{ pending_payment|floatformat:2 }}</strong>
+        </article>
+    </div>
+</section>
+
+<section class="control-grid mt-4">
+    <a class="control-card" href="{% url 'business-settings' %}">
+        <span>Website Setup</span>
+        <strong>Business profile</strong>
+        <p>Shop name, logo, mobile, WhatsApp, address, GST, payment QR, UPI and bank details.</p>
+    </a>
+    <a class="control-card" href="{% url 'product-list' %}">
+        <span>{{ live_products }} live, {{ hidden_products }} hidden</span>
+        <strong>Products & services</strong>
+        <p>Furniture/aluminium items, featured products, website visibility, photos and starting rates.</p>
+    </a>
+    <a class="control-card" href="{% url 'enquiry-list' %}">
+        <span>{{ new_enquiries }} new</span>
+        <strong>Public enquiries</strong>
+        <p>Website quote requests, call/WhatsApp preference, status and admin notes.</p>
+    </a>
+    <a class="control-card" href="{% url 'team-contact-list' %}">
+        <span>{{ team_contacts }} contacts</span>
+        <strong>Website contacts</strong>
+        <p>Owner, manager, supervisor and support numbers shown on public website.</p>
+    </a>
+    <a class="control-card" href="{% url 'order-list' %}">
+        <span>{{ pending_orders }} pending/working</span>
+        <strong>Orders & measurements</strong>
+        <p>Customer orders, site measurements, delivery status, payments and invoice links.</p>
+    </a>
+    <a class="control-card" href="{% url 'transaction-list' %}">
+        <span>Income / Expense</span>
+        <strong>Money control</strong>
+        <p>Customer receipts, material purchase, worker wages, supplier payment and balance tracking.</p>
+    </a>
+    <a class="control-card" href="{% url 'stock-list' %}">
+        <span>{{ stock_items }} items</span>
+        <strong>Stock management</strong>
+        <p>Aluminium sections, furniture material, hardware, purchase price and low-stock limit.</p>
+    </a>
+    <a class="control-card" href="{% url 'worker-list' %}">
+        <span>{{ workers }} active</span>
+        <strong>Workers & assignment</strong>
+        <p>Worker profile, skill, wage, due payment and assigned work tracking.</p>
+    </a>
+    <a class="control-card" href="{% url 'admin:index' %}">
+        <span>Advanced</span>
+        <strong>Django Admin</strong>
+        <p>Advanced database editing, user accounts, groups and permissions.</p>
+    </a>
+</section>
+
+<section class="panel mt-4">
+    <div class="panel-header">
+        <h2>Quick Website Actions</h2>
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'public-catalog' %}">Open Website</a>
+    </div>
+    <div class="quick-actions">
+        <a class="btn btn-primary" href="{% url 'product-add' %}">Add Product</a>
+        <a class="btn btn-outline-primary" href="{% url 'team-contact-add' %}">Add Contact</a>
+        <a class="btn btn-outline-primary" href="{% url 'business-settings' %}">Update Settings</a>
+        <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">ERP Dashboard</a>
+    </div>
+</section>
+{% endblock %}

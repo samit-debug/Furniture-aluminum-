@@ -3,14 +3,17 @@ from django.contrib import admin
 from .models import (
     BusinessProfile,
     Customer,
+    FinancialTransaction,
     Invoice,
     Measurement,
     Order,
     Payment,
     PasswordResetOTP,
+    PublicEnquiry,
     Product,
     Report,
     Stock,
+    TeamContact,
     WorkAssignment,
     Worker,
 )
@@ -19,6 +22,20 @@ from .models import (
 @admin.register(BusinessProfile)
 class BusinessProfileAdmin(admin.ModelAdmin):
     list_display = ("shop_name", "owner_name", "mobile", "email", "updated_at")
+
+
+@admin.register(TeamContact)
+class TeamContactAdmin(admin.ModelAdmin):
+    list_display = ("name", "mobile", "role", "is_primary", "show_on_website")
+    list_filter = ("role", "is_primary", "show_on_website")
+    search_fields = ("name", "mobile")
+
+
+@admin.register(PublicEnquiry)
+class PublicEnquiryAdmin(admin.ModelAdmin):
+    list_display = ("name", "mobile", "city", "service_required", "preferred_contact", "status", "created_at")
+    list_filter = ("status", "service_required", "preferred_contact", "created_at")
+    search_fields = ("name", "mobile", "email", "city", "message")
 
 
 @admin.register(Customer)
@@ -110,6 +127,22 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = ("order", "amount", "method", "payment_date", "reference_number")
     list_filter = ("method", "payment_date")
     search_fields = ("order__customer__name", "order__product_name", "reference_number")
+
+
+@admin.register(FinancialTransaction)
+class FinancialTransactionAdmin(admin.ModelAdmin):
+    list_display = (
+        "transaction_date",
+        "transaction_type",
+        "category",
+        "title",
+        "amount",
+        "method",
+        "party_name",
+        "reference_number",
+    )
+    list_filter = ("transaction_type", "category", "method", "transaction_date")
+    search_fields = ("title", "party_name", "reference_number", "customer__name", "worker__name")
 
 
 @admin.register(Invoice)

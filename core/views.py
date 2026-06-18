@@ -19,28 +19,36 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from .forms import (
     BusinessProfileForm,
     CustomerForm,
+    FinancialTransactionForm,
     InvoiceForm,
     MeasurementForm,
     OTPPasswordResetRequestForm,
     OTPPasswordResetVerifyForm,
     OrderForm,
     PaymentForm,
+    PublicEnquiryAdminForm,
+    PublicEnquiryForm,
     ProductForm,
     ReportForm,
+    RRVAuthenticationForm,
     StockForm,
+    TeamContactForm,
     WorkAssignmentForm,
     WorkerForm,
 )
 from .models import (
     BusinessProfile,
     Customer,
+    FinancialTransaction,
     Invoice,
     Order,
     Payment,
     PasswordResetOTP,
+    PublicEnquiry,
     Product,
     Report,
     Stock,
+    TeamContact,
     WorkAssignment,
     Worker,
 )
@@ -87,18 +95,33 @@ class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 
 class RRVLoginView(LoginView):
+    authentication_form = RRVAuthenticationForm
     template_name = "registration/login.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.setdefault("login_title", "Login")
         context.setdefault("login_subtitle", "Customer, order, stock, billing, payment, and worker management.")
+        if settings.DEBUG:
+            context.setdefault(
+                "login_help",
+                "Email login tabhi chalega jab wahi email user account me saved ho.",
+            )
         return context
 
 
 class AdminControlLoginView(RRVLoginView):
     def get_success_url(self):
-        return self.get_redirect_url() or reverse("dashboard")
+        return self.get_redirect_url() or reverse("admin-control")
+
+    def form_valid(self, form):
+        if not is_admin_role(form.get_user()):
+            form.add_error(
+                None,
+                "Admin Control sirf owner/admin ke liye hai. Is user ko Admin group ya superuser permission do.",
+            )
+            return self.form_invalid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -227,6 +250,22 @@ def dashboard(request):
         payments.filter(payment_date__gte=month_start, payment_date__lte=today).aggregate(total=Sum("amount"))["total"]
         or Decimal("0.00")
     )
+    month_income = (
+        FinancialTransaction.objects.filter(
+            transaction_type=FinancialTransaction.TYPE_INCOME,
+            transaction_date__gte=month_start,
+            transaction_date__lte=today,
+        ).aggregate(total=Sum("amount"))["total"]
+        or Decimal("0.00")
+    )
+    month_expense = (
+        FinancialTransaction.objects.filter(
+            transaction_type=FinancialTransaction.TYPE_EXPENSE,
+            transaction_date__gte=month_start,
+            transaction_date__lte=today,
+        ).aggregate(total=Sum("amount"))["total"]
+        or Decimal("0.00")
+    )
     pending_payment = sum((order.remaining_amount for order in orders), Decimal("0.00"))
 
     status_counts = {
@@ -243,26 +282,81 @@ def dashboard(request):
         "delivered_orders": status_counts.get(Order.STATUS_DELIVERED, 0),
         "today_sale": today_sale,
         "monthly_sale": monthly_sale,
+        "month_income": month_income,
+        "month_expense": month_expense,
+        "month_net": month_income - month_expense,
         "pending_payment": pending_payment,
+        "new_enquiries": PublicEnquiry.objects.filter(status=PublicEnquiry.STATUS_NEW).count(),
         "low_stock_items": [item for item in Stock.objects.all() if item.is_low_stock],
         "recent_orders": orders[:8],
         "recent_payments": payments.select_related("order", "order__customer")[:6],
+        "recent_enquiries": PublicEnquiry.objects.all()[:6],
     }
     return render(request, "core/dashboard.html", context)
 
 
 @login_required(login_url="admin-control-login")
-@user_passes_test(is_admin_role, login_url="admin-control-login")
 def admin_control(request):
-    return redirect("dashboard")
+    if not is_admin_role(request.user):
+        messages.error(request, "Admin Control open karne ke liye owner/admin permission chahiye.")
+        return redirect("dashboard")
+
+    live_products = Product.objects.filter(is_active=True, show_on_website=True).count()
+    hidden_products = Product.objects.filter(is_active=True, show_on_website=False).count()
+    context = {
+        "live_products": live_products,
+        "hidden_products": hidden_products,
+        "featured_products": Product.objects.filter(is_active=True, featured=True).count(),
+        "new_enquiries": PublicEnquiry.objects.filter(status=PublicEnquiry.STATUS_NEW).count(),
+        "team_contacts": TeamContact.objects.count(),
+        "stock_items": Stock.objects.count(),
+        "workers": Worker.objects.filter(is_active=True).count(),
+        "pending_orders": Order.objects.filter(status__in=[Order.STATUS_PENDING, Order.STATUS_IN_PROGRESS]).count(),
+        "pending_payment": sum((order.remaining_amount for order in Order.objects.all()), Decimal("0.00")),
+    }
+    return render(request, "core/admin_control.html", context)
 
 
 def public_catalog(request):
+    profile = BusinessProfile.get_solo()
+    enquiry_form = PublicEnquiryForm(request.POST or None)
+    if request.method == "POST" and enquiry_form.is_valid():
+        enquiry_form.save()
+        messages.success(request, "Enquiry submit ho gayi. Hamari team jaldi contact karegi.")
+        return redirect("public-catalog")
+
     products = Product.objects.filter(is_active=True, show_on_website=True).order_by("-featured", "category", "name")
+    team_contacts = TeamContact.objects.filter(show_on_website=True)
     context = {
         "products": products,
         "featured_products": products.filter(featured=True)[:6],
-        "business_profile": BusinessProfile.get_solo(),
+        "business_profile": profile,
+        "team_contacts": team_contacts,
+        "primary_contact": team_contacts.first(),
+        "enquiry_form": enquiry_form,
+        "service_tiles": [
+            {
+                "title": "Aluminum Windows & Doors",
+                "text": "Slim profiles, smooth sliding, powder-coated frames and glass fitting.",
+                "visual_class": "service-aluminum",
+            },
+            {
+                "title": "Custom Furniture",
+                "text": "Beds, sofas, wardrobes, cabinets and office furniture made to measurement.",
+                "visual_class": "service-furniture",
+            },
+            {
+                "title": "Glass Partitions",
+                "text": "Shop, office and home partition work with clean aluminium framing.",
+                "visual_class": "service-glass",
+            },
+        ],
+        "process_steps": [
+            ("01", "Site Measurement", "Exact size, material and design requirement recorded."),
+            ("02", "Design & Quote", "Clear product scope with rate, advance and delivery plan."),
+            ("03", "Making & Fitting", "Workshop fabrication, site fitting and final finishing."),
+            ("04", "Billing & Support", "Invoice, payment record and after-work contact support."),
+        ],
     }
     return render(request, "core/public_catalog.html", context)
 
@@ -341,6 +435,44 @@ class ProductUpdateView(AdminRequiredMixin, UpdateView):
     template_name = "core/form.html"
     success_url = reverse_lazy("product-list")
     extra_context = {"title": "Edit Product", "submit_label": "Update Product"}
+
+
+class TeamContactListView(AdminRequiredMixin, ERPListView):
+    model = TeamContact
+    template_name = "core/team_contact_list.html"
+    context_object_name = "contacts"
+    search_fields = ("name", "mobile", "role", "notes")
+
+
+class TeamContactCreateView(AdminRequiredMixin, CreateView):
+    model = TeamContact
+    form_class = TeamContactForm
+    template_name = "core/form.html"
+    success_url = reverse_lazy("team-contact-list")
+    extra_context = {"title": "Add Contact", "submit_label": "Save Contact"}
+
+
+class TeamContactUpdateView(AdminRequiredMixin, UpdateView):
+    model = TeamContact
+    form_class = TeamContactForm
+    template_name = "core/form.html"
+    success_url = reverse_lazy("team-contact-list")
+    extra_context = {"title": "Edit Contact", "submit_label": "Update Contact"}
+
+
+class PublicEnquiryListView(StaffRequiredMixin, ERPListView):
+    model = PublicEnquiry
+    template_name = "core/enquiry_list.html"
+    context_object_name = "enquiries"
+    search_fields = ("name", "mobile", "email", "city", "message")
+
+
+class PublicEnquiryUpdateView(StaffRequiredMixin, UpdateView):
+    model = PublicEnquiry
+    form_class = PublicEnquiryAdminForm
+    template_name = "core/form.html"
+    success_url = reverse_lazy("enquiry-list")
+    extra_context = {"title": "Update Enquiry", "submit_label": "Save Enquiry"}
 
 
 class OrderListView(ERPListView):
@@ -521,6 +653,30 @@ class PaymentCreateView(StaffRequiredMixin, CreateView):
     template_name = "core/form.html"
     success_url = reverse_lazy("payment-list")
     extra_context = {"title": "Record Payment", "submit_label": "Save Payment"}
+
+
+class FinancialTransactionListView(AdminRequiredMixin, ERPListView):
+    model = FinancialTransaction
+    template_name = "core/transaction_list.html"
+    context_object_name = "transactions"
+    search_fields = ("title", "party_name", "reference_number", "customer__name", "worker__name")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        income = FinancialTransaction.objects.filter(transaction_type=FinancialTransaction.TYPE_INCOME).aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
+        expense = FinancialTransaction.objects.filter(transaction_type=FinancialTransaction.TYPE_EXPENSE).aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
+        context["total_income"] = income
+        context["total_expense"] = expense
+        context["net_balance"] = income - expense
+        return context
+
+
+class FinancialTransactionCreateView(AdminRequiredMixin, CreateView):
+    model = FinancialTransaction
+    form_class = FinancialTransactionForm
+    template_name = "core/form.html"
+    success_url = reverse_lazy("transaction-list")
+    extra_context = {"title": "Add Transaction", "submit_label": "Save Transaction"}
 
 
 @login_required

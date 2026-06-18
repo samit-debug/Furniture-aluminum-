@@ -12,6 +12,23 @@ User = get_user_model()
 MONEY_ZERO = Decimal("0.00")
 
 
+PRODUCT_CATEGORY_CHOICES = [
+    ("aluminum_window", "Aluminum Window"),
+    ("aluminum_door", "Aluminum Door"),
+    ("aluminum_partition", "Aluminum Partition"),
+    ("aluminum_frame", "Aluminum Frame"),
+    ("aluminum_rack", "Aluminum Rack"),
+    ("wooden_bed", "Wooden Bed"),
+    ("sofa", "Sofa"),
+    ("table", "Table"),
+    ("chair", "Chair"),
+    ("wardrobe", "Wardrobe"),
+    ("kitchen_cabinet", "Kitchen Cabinet"),
+    ("office_furniture", "Office Furniture"),
+    ("custom_design", "Custom Design"),
+]
+
+
 class Customer(models.Model):
     name = models.CharField(max_length=120)
     mobile = models.CharField(max_length=20)
@@ -33,11 +50,23 @@ class Customer(models.Model):
 class BusinessProfile(models.Model):
     shop_name = models.CharField(max_length=160, default="RRV furniture & aluminum workers")
     owner_name = models.CharField(max_length=120, default="Rajesh")
+    tagline = models.CharField(
+        max_length=220,
+        default="Furniture, aluminum, glass and custom interior work across India.",
+    )
     mobile = models.CharField(max_length=20, blank=True)
     whatsapp_number = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
     address = models.TextField(blank=True)
+    service_area = models.CharField(max_length=180, default="All India service available")
     gst_number = models.CharField(max_length=40, blank=True)
+    upi_id = models.CharField(max_length=80, blank=True)
+    bank_name = models.CharField(max_length=120, blank=True)
+    account_holder_name = models.CharField(max_length=120, blank=True)
+    account_number = models.CharField(max_length=40, blank=True)
+    ifsc_code = models.CharField(max_length=20, blank=True)
+    payment_qr = models.FileField(upload_to="business/payments/", blank=True)
+    show_payment_details = models.BooleanField(default=True)
     logo = models.FileField(upload_to="business/", blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -52,6 +81,69 @@ class BusinessProfile(models.Model):
     def get_solo(cls):
         profile, _created = cls.objects.get_or_create(pk=1)
         return profile
+
+
+class TeamContact(models.Model):
+    ROLE_CHOICES = [
+        ("owner", "Owner"),
+        ("manager", "Manager"),
+        ("site_supervisor", "Site Supervisor"),
+        ("billing", "Billing"),
+        ("support", "Support"),
+    ]
+
+    name = models.CharField(max_length=120)
+    mobile = models.CharField(max_length=20)
+    role = models.CharField(max_length=30, choices=ROLE_CHOICES, default="support")
+    whatsapp_enabled = models.BooleanField(default=True)
+    is_primary = models.BooleanField(default=False)
+    show_on_website = models.BooleanField(default=True)
+    notes = models.CharField(max_length=160, blank=True)
+
+    class Meta:
+        ordering = ["-is_primary", "name"]
+
+    def __str__(self):
+        return f"{self.name} - {self.mobile}"
+
+
+class PublicEnquiry(models.Model):
+    STATUS_NEW = "new"
+    STATUS_CONTACTED = "contacted"
+    STATUS_QUOTED = "quoted"
+    STATUS_CONVERTED = "converted"
+    STATUS_CLOSED = "closed"
+
+    STATUS_CHOICES = [
+        (STATUS_NEW, "New"),
+        (STATUS_CONTACTED, "Contacted"),
+        (STATUS_QUOTED, "Quoted"),
+        (STATUS_CONVERTED, "Converted"),
+        (STATUS_CLOSED, "Closed"),
+    ]
+
+    name = models.CharField(max_length=120)
+    mobile = models.CharField(max_length=20)
+    email = models.EmailField(blank=True)
+    city = models.CharField(max_length=120)
+    service_required = models.CharField(max_length=40, choices=PRODUCT_CATEGORY_CHOICES)
+    message = models.TextField(blank=True)
+    preferred_contact = models.CharField(
+        max_length=20,
+        choices=[("call", "Call"), ("whatsapp", "WhatsApp"), ("email", "Email")],
+        default="call",
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_NEW)
+    admin_note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Public enquiries"
+
+    def __str__(self):
+        return f"{self.name} - {self.get_service_required_display()}"
 
 
 class PasswordResetOTP(models.Model):
@@ -85,21 +177,7 @@ class Product(models.Model):
         (ORDER_TYPE_BOTH, "Both"),
     ]
 
-    CATEGORY_CHOICES = [
-        ("aluminum_window", "Aluminum Window"),
-        ("aluminum_door", "Aluminum Door"),
-        ("aluminum_partition", "Aluminum Partition"),
-        ("aluminum_frame", "Aluminum Frame"),
-        ("aluminum_rack", "Aluminum Rack"),
-        ("wooden_bed", "Wooden Bed"),
-        ("sofa", "Sofa"),
-        ("table", "Table"),
-        ("chair", "Chair"),
-        ("wardrobe", "Wardrobe"),
-        ("kitchen_cabinet", "Kitchen Cabinet"),
-        ("office_furniture", "Office Furniture"),
-        ("custom_design", "Custom Design"),
-    ]
+    CATEGORY_CHOICES = PRODUCT_CATEGORY_CHOICES
 
     name = models.CharField(max_length=120)
     category = models.CharField(max_length=40, choices=CATEGORY_CHOICES)
@@ -347,6 +425,52 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.order} - {self.amount}"
+
+
+class FinancialTransaction(models.Model):
+    TYPE_INCOME = "income"
+    TYPE_EXPENSE = "expense"
+    TYPE_CHOICES = [
+        (TYPE_INCOME, "Income / Received"),
+        (TYPE_EXPENSE, "Expense / Paid"),
+    ]
+
+    CATEGORY_CHOICES = [
+        ("customer_payment", "Customer Payment"),
+        ("advance", "Advance"),
+        ("worker_wage", "Worker Wage"),
+        ("material_purchase", "Material Purchase"),
+        ("supplier_payment", "Supplier Payment"),
+        ("refund", "Refund"),
+        ("transport", "Transport"),
+        ("rent", "Rent"),
+        ("electricity", "Electricity"),
+        ("maintenance", "Maintenance"),
+        ("other", "Other"),
+    ]
+
+    METHOD_CHOICES = Payment.METHOD_CHOICES + [("online_gateway", "Online Gateway")]
+
+    transaction_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES)
+    title = models.CharField(max_length=140)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    method = models.CharField(max_length=30, choices=METHOD_CHOICES)
+    transaction_date = models.DateField(default=timezone.localdate)
+    customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.SET_NULL)
+    worker = models.ForeignKey(Worker, null=True, blank=True, on_delete=models.SET_NULL)
+    order = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL)
+    party_name = models.CharField(max_length=120, blank=True)
+    reference_number = models.CharField(max_length=100, blank=True)
+    attachment = models.FileField(upload_to="transactions/", blank=True)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-transaction_date", "-id"]
+
+    def __str__(self):
+        return f"{self.get_transaction_type_display()} - {self.title} - {self.amount}"
 
 
 class Invoice(models.Model):

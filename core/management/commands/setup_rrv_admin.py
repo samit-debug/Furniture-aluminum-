@@ -2,7 +2,9 @@ import os
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 
 from core.models import BusinessProfile
 
@@ -14,6 +16,11 @@ class Command(BaseCommand):
         username = os.environ.get("RRV_ADMIN_USERNAME", "rajesh")
         email = os.environ.get("RRV_ADMIN_EMAIL", "")
         password = os.environ.get("RRV_ADMIN_PASSWORD", "")
+
+        if not settings.DEBUG and (not email or not password):
+            raise CommandError(
+                "Set RRV_ADMIN_EMAIL and RRV_ADMIN_PASSWORD in Render environment variables before deploy."
+            )
 
         for group_name in ["Admin", "Staff", "Worker"]:
             Group.objects.get_or_create(name=group_name)
